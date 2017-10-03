@@ -1,8 +1,10 @@
+#! /usr/bin/env node
+
 const program = require("commander");
 const chalk = require("chalk");
 const axios = require("axios");
 const ora = require("ora");
-const pkg = require("./package.json");
+const pkg = require("../package.json");
 
 const ARTICLE_URL = "https://newsapi.org/v1/articles";
 const SOURCES_URL = "https://newsapi.org/v1/sources";
@@ -19,7 +21,7 @@ const API_KEY = "72ef587891b7421ab53dd1711732e327";
  */
 async function getLatestStories(source, sortBy) {
   const stores = await axios({
-    url: "https://newsapi.org/v1/articles",
+    url: ARTICLE_URL,
     params: {
       apiKey: API_KEY,
       source,
@@ -78,21 +80,26 @@ async function searchStories(searchTerm) {
 /**
  * printStories
  *
- * @param stories
+ * Pretty-prints a list of news stories.
+ * @param stories - list of stories to print to console.
  * @returns {undefined}
  */
 function printStories(stories) {
   if (stories.length === 0) {
-    console.log(chalk.bold.red('\n No results found.'));
+    console.log(chalk.bold.red("\n No results found."));
     return;
-  } 
+  }
 
   stories.forEach(({ author, title, description, url, publishedAt }) => {
     console.log(chalk.bold.underline.yellow(title));
     console.log(`by ${chalk.green(author)}`);
     console.log(chalk.italic(description));
     console.log(`${chalk.bold("Link:")} ${chalk.cyan(url)}`);
-    console.log(`${chalk.bold("Published")} ${chalk.red(new Date(publishedAt)).toLocaleString()} \n`);
+    console.log(
+      `${chalk.bold("Published")} ${chalk
+        .red(new Date(publishedAt))
+        .toLocaleString()} \n`
+    );
   });
 }
 
@@ -135,18 +142,27 @@ function throwError(error, spinner) {
   spinner.stop();
 }
 
-program.version(pkg.version);
+program
+  .version(pkg.version)
+  .option(
+    "-l, --limit <limit>",
+    "limit the amount of news stories you want to see."
+  )
+  .option(
+    "-s, --sort <sort>",
+    "sort to apply to the news stories. Choices include top, latest or popular.  ",
+    /^(latest|popular|top)$/i,
+    "top"
+  )
+  .option(
+    "-c, --category <category>",
+    "category of sources you want to see. Choices include: business, entertainment, gaming, general, music, politics, science-and-nature, sport, technology."
+  )
+  .usage("[command] [<args>]");
 
 program
   .command("fetch <source>")
   .description("get news stories from a chosen source.")
-  .option("-l, --limit <limit>")
-  .option(
-    "-s, --sort <sort>",
-    "sort to apply to the news stories",
-    /^(latest|popular|top)$/i,
-    "top"
-  )
   .action(function(source, { sort, limit }) {
     const spinner = ora(
       chalk.green(
@@ -162,10 +178,16 @@ program
 
         printStories(stories.slice(0, numStories));
       })
-      .catch((err) => {
+      .catch(err => {
         if (err.response.status === 400) {
           throwError(
-            `The selected news source ${chalk.green(source)} does not support the provided sort type (${chalk.green(sort)}). Please try another sort type. The 3 sort types are ${chalk.italic('popular, top and latest.')}`,
+            `The selected news source ${chalk.green(
+              source
+            )} does not support the provided sort type (${chalk.green(
+              sort
+            )}). Please try another sort type. The 3 sort types are ${chalk.italic(
+              "popular, top and latest."
+            )}`,
             spinner
           );
         } else {
@@ -180,7 +202,6 @@ program
 program
   .command("sources")
   .description("Show all the sources that you can get news from.")
-  .option("-c, --category <category>")
   .action(({ category }) => {
     const spinner = ora("Fetching news sources..").start();
 
@@ -200,7 +221,6 @@ program
         );
         spinner.stop();
       });
-
   });
 
 program
@@ -234,3 +254,7 @@ program
   });
 
 program.parse(process.argv);
+
+if (!program.args.length) {
+  program.help();
+}
