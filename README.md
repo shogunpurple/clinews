@@ -1,7 +1,7 @@
 # clinews :earth_africa: :newspaper: :computer:
 [![npm](https://img.shields.io/npm/dt/clinews.svg)](https://www.npmjs.com/package/clinews)
 [![npm](https://img.shields.io/npm/v/clinews.svg)](https://www.npmjs.com/package/clinews)
-[![license](https://img.shields.io/github/license/mashape/clinews.svg)](https://github.com/mmckeaveney/clinews/blob/master/LICENSE)
+[![license](https://img.shields.io/github/license/mmckeaveney/clinews.svg)](https://github.com/mmckeaveney/clinews/blob/master/LICENSE)
 
 A CLI for reading the news which supports over 70 sources. Get all the latest headlines from around the world without leaving your terminal. Powered by [NewsAPI.org](https://newsapi.org/).
 
