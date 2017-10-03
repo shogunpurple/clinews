@@ -1,4 +1,5 @@
-# clinews
+# clinews :earth_africa: :newspaper: :computer:
+
 A CLI for reading the news which supports over 70 sources. Get all the latest headlines from around the world without leaving your terminal. Powered by [NewsAPI.org](https://newsapi.org/).
 
 clinews allows you to:
