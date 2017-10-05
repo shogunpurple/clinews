@@ -12,6 +12,8 @@ clinews allows you to:
 - Search across all the sources for a particular word or phrase in the title.
 
 ## Installation
+Note: You must be on node version **7.6.0** or later to use clinews.
+
 **npm** 
 ```
 npm i -g clinews
