@@ -1,4 +1,7 @@
 # clinews :earth_africa: :newspaper: :computer:
+[![npm](https://img.shields.io/npm/dt/clinews.svg)](https://www.npmjs.com/package/clinews)
+[![npm](https://img.shields.io/npm/v/clinews.svg)](https://www.npmjs.com/package/clinews)
+[![license](https://img.shields.io/github/license/mmckeaveney/clinews.svg)](https://github.com/mmckeaveney/clinews/blob/master/LICENSE)
 
 A CLI for reading the news which supports over 70 sources. Get all the latest headlines from around the world without leaving your terminal. Powered by [NewsAPI.org](https://newsapi.org/).
 
@@ -9,6 +12,8 @@ clinews allows you to:
 - Search across all the sources for a particular word or phrase in the title.
 
 ## Installation
+Note: You must be on node version **7.6.0** or later to use clinews.
+
 **npm** 
 ```
 npm i -g clinews
