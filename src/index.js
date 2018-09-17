@@ -6,7 +6,7 @@ const axios = require("axios");
 const ora = require("ora");
 const pkg = require("../package.json");
 
-const ARTICLE_URL = "https://newsapi.org/v2/articles";
+const ARTICLE_URL = "https://newsapi.org/v1/articles";
 const SOURCES_URL = "https://newsapi.org/v2/sources";
 const SEARCH_URL = "https://newsapi.org/v2/everything";
 const API_KEY = "72ef587891b7421ab53dd1711732e327";
