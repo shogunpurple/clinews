@@ -6,8 +6,9 @@ const axios = require("axios");
 const ora = require("ora");
 const pkg = require("../package.json");
 
-const ARTICLE_URL = "https://newsapi.org/v1/articles";
-const SOURCES_URL = "https://newsapi.org/v1/sources";
+const ARTICLE_URL = "https://newsapi.org/v2/articles";
+const SOURCES_URL = "https://newsapi.org/v2/sources";
+const SEARCH_URL = "https://newsapi.org/v2/everything";
 const API_KEY = "72ef587891b7421ab53dd1711732e327";
 
 /**
@@ -20,7 +21,7 @@ const API_KEY = "72ef587891b7421ab53dd1711732e327";
  * @returns {Array} a list of the stories
  */
 async function getLatestStories(source, sortBy) {
-  const stores = await axios({
+  const stories = await axios({
     url: ARTICLE_URL,
     params: {
       apiKey: API_KEY,
@@ -29,7 +30,7 @@ async function getLatestStories(source, sortBy) {
     }
   });
 
-  return stores.data.articles;
+  return stories.data.articles;
 }
 
 /**
@@ -62,19 +63,14 @@ async function getNewsSources(category) {
  * @returns {Array} the list of stories matching the search criteria.
  */
 async function searchStories(searchTerm) {
-  const searchRgx = new RegExp(searchTerm, "i");
-
-  const sources = await getNewsSources();
-
-  const stories = await Promise.all(
-    sources.map(({ id, sortBysAvailable }) => {
-      return getLatestStories(id, sortBysAvailable[0]);
-    })
-  );
-
-  return stories
-    .reduce((tot, curr) => tot.concat(curr), [])
-    .filter(({ title }) => title.match(searchRgx));
+  const stories = await axios({
+    url: SEARCH_URL,
+    params: {
+      apiKey: API_KEY,
+      q: encodeURIComponent(searchTerm) 
+    }
+  });
+  return stories.data.articles;
 }
 
 /**
