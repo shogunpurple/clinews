@@ -6,10 +6,12 @@ const axios = require("axios");
 const ora = require("ora");
 const pkg = require("../package.json");
 
-const ARTICLE_URL = "https://newsapi.org/v1/articles";
-const SOURCES_URL = "https://newsapi.org/v2/sources";
-const SEARCH_URL = "https://newsapi.org/v2/everything";
-const API_KEY = "72ef587891b7421ab53dd1711732e327";
+const NEWS_API_URL = "https://newsapi.org";
+const TOP_HEADLINES_URL = `${NEWS_API_URL}/v2/top-headlines`;
+const SOURCES_URL = `${NEWS_API_URL}/v2/sources`;
+const SEARCH_URL = `${NEWS_API_URL}/v2/everything`;
+const API_KEY = process.env.API_KEY || "72ef587891b7421ab53dd1711732e327";
+
 
 /**
  * getLatestStories
@@ -17,16 +19,15 @@ const API_KEY = "72ef587891b7421ab53dd1711732e327";
  * Get news stories from a given source.
  *
  * @param source - the source id to get the news stories from.
- * @param sortBy - the sort parameter - (top, latest or popular)
  * @returns {Array} a list of the stories
  */
-async function getLatestStories(source, sortBy) {
+async function getLatestStories(source, limit) {
   const stories = await axios({
-    url: ARTICLE_URL,
+    url: TOP_HEADLINES_URL,
     params: {
       apiKey: API_KEY,
-      source,
-      sortBy
+      sources: [source],
+      pageSize: Math.min(100, limit)
     }
   });
 
@@ -99,6 +100,7 @@ function printStories(stories) {
   });
 }
 
+
 /**
  * printSources
  *
@@ -124,6 +126,7 @@ function printSources(sources) {
   );
 }
 
+
 /**
  * throwError
  *
@@ -138,28 +141,20 @@ function throwError(error, spinner) {
   spinner.stop();
 }
 
+
 program
   .version(pkg.version)
-  .option(
-    "-l, --limit <limit>",
-    "limit the amount of news stories you want to see."
-  )
-  .option(
-    "-s, --sort <sort>",
-    "sort to apply to the news stories. Choices include top, latest or popular.  ",
-    /^(latest|popular|top)$/i,
-    "top"
-  )
-  .option(
-    "-c, --category <category>",
-    "category of sources you want to see. Choices include: business, entertainment, gaming, general, music, politics, science-and-nature, sport, technology."
-  )
   .usage("[command] [<args>]");
+
 
 program
   .command("fetch <source>")
   .description("get news stories from a chosen source.")
-  .action(function(source, { sort, limit }) {
+  .option(
+    "-l, --limit <limit>",
+    "limit the amount of news stories you want to see."
+  )
+  .action(function(source, { limit }) {
     const spinner = ora(
       chalk.green(
         "fetching latest stories from " +
@@ -167,37 +162,29 @@ program
       )
     ).start();
 
-    getLatestStories(source, sort)
+    getLatestStories(source, limit)
       .then(stories => {
-        const numStories = limit ? limit : stories.length;
         spinner.stop();
+        console.log(limit);
 
-        printStories(stories.slice(0, numStories));
+        printStories(stories);
       })
       .catch(err => {
-        if (err.response.status === 400) {
-          throwError(
-            `The selected news source ${chalk.green(
-              source
-            )} does not support the provided sort type (${chalk.green(
-              sort
-            )}). Please try another sort type. The 3 sort types are ${chalk.italic(
-              "popular, top and latest."
-            )}`,
-            spinner
-          );
-        } else {
-          throwError(
-            "There has been a problem fetching your news stories. Please try again later.",
-            spinner
-          );
-        }
+        throwError(
+          "There has been a problem fetching your news stories. Please try again later.",
+          spinner
+        );
       });
   });
+
 
 program
   .command("sources")
   .description("Show all the sources that you can get news from.")
+  .option(
+    "-c, --category <category>",
+    "category of sources you want to see. Choices include: business, entertainment, gaming, general, music, politics, science-and-nature, sport, technology."
+  )
   .action(({ category }) => {
     const spinner = ora("Fetching news sources..").start();
 
@@ -218,6 +205,7 @@ program
         spinner.stop();
       });
   });
+
 
 program
   .command("search <term>")
@@ -248,6 +236,7 @@ program
         }
       });
   });
+
 
 program.parse(process.argv);
 

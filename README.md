@@ -62,7 +62,6 @@ clinews supports some extra flags as well. See below:
 ```
 -V, --version              output the version number
 -l, --limit <limit>        limit the amount of news stories you want to see.
--s, --sort <sort>          sort to apply to the news stories, Choices include top, latest or popular.
 -c, --category <category>  category of sources you want to see. Choices include: business, entertainment, gaming, general, music, politics, science-and-nature, sport, technology.
 -h, --help                 output usage information
 ```
